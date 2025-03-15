@@ -1,0 +1,6 @@
+unix
+linux
+python
+AI
+WSN
+rust
