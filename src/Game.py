@@ -1,4 +1,4 @@
-from Player import Player, NetPlayer, AIPlayer
+from Player import Player, NetPlayer, AIPlayerAttack, AIPlayerHold
 from Wall import Wall
 from Region import Region
 import pygame
@@ -113,9 +113,15 @@ class Game:
                     self.phase = "game"
                 elif key == "space":
                     if len(self.teams[0]) > len(self.teams[1]):
-                        self.teams[1].append(AIPlayer(1,1,self, 0))
+                        if random.random() > 0.5:
+                            self.teams[1].append(AIPlayerAttack(1,1,self, 0))
+                        else:
+                            self.teams[1].append(AIPlayerHold(1, 1, self, 0))
                     else:
-                        self.teams[0].append(AIPlayer(1,1,self, 1))
+                        if random.random() > 0.5:
+                            self.teams[0].append(AIPlayerAttack(1,1,self, 1))
+                        else:
+                            self.teams[0].append(AIPlayerHold(1, 1, self, 1))
             self.teams[0][0].held_keys = []
         
         for (i,team) in enumerate(self.teams):
@@ -127,7 +133,7 @@ class Game:
                 
         for team in self.teams:
             for player in team:
-                if type(player) == AIPlayer:
+                if type(player) == AIPlayerAttack or type(player) == AIPlayerHold:
                     player.update(timediff)
                 player.updateProjectiles(timediff)
 
@@ -193,6 +199,8 @@ class Game:
                 player.typedWord = ""
                 player.held_keys = []
                 break
+            elif key == "left shift":
+                player.boost()
             elif key == "j":
                 if player.y - player.mouseY == 0:
                     angle = 0
@@ -303,6 +311,7 @@ class Game:
         screen.blit(font.render(str(len(self.teams[0])) + " vs " + str(len(self.teams[1])), False, (0,0,0)), (200, 250))
     
     def displayTypedWord(self, screen):
+        pygame.draw.rect(screen, (200, 150, 150), pygame.Rect(200, 800, 1000, 100))
         w = self.teams[self.playerPos[0]][self.playerPos[1]].typedWord
         s = font.render(w, False, (0,0,0))
         screen.blit(s, (600, 850))
@@ -327,6 +336,8 @@ class Game:
     def displayWords(self, screen):
         for (i, team) in enumerate(self.teams):
             x = 20 if i == 1 else 1220
+            pygame.draw.rect(screen, (145, 200, 255), pygame.Rect(x-20, 0, 200, 900))
+            
             for (j, word) in enumerate(self.shownWords[i]):
                 sur = font.render(word, False, (0,0,0))
                 screen.blit(sur, (x, j * 50 + 50))

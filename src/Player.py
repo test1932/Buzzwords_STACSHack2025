@@ -10,6 +10,8 @@ class Player:
     image = pygame.image.load("../assets/Player.png")
     image = pygame.transform.scale(image, (WIDTH, HEIGHT))
     COOLDOWN = 0.5
+    SPEED_COOLDOWN = 3
+    BOOST_PERIOD = 0.5
     
     def __init__(self, x, y):
         self.x = x
@@ -21,6 +23,8 @@ class Player:
         self.image = Player.image
         self.projectiles = []
         self.last_shot = time.time()
+        self.last_speed = time.time()
+        self.isBoost = False
         
         self.held_keys = []
         self.mouseX = 0
@@ -36,6 +40,10 @@ class Player:
             projectile.display(screen)
         
     def moveForwards(self, value):
+        if time.time() - self.last_speed > Player.BOOST_PERIOD:
+            self.isBoost = False
+        if self.isBoost:
+            value *= 2
         self.x += math.sin(self.angle) * value
         self.y += math.cos(self.angle) * value
 
@@ -76,9 +84,14 @@ class Player:
         self.isTyping = data["typing"]
         self.typedWord = data["word"]
         return self
+    
+    def boost(self):
+        if time.time() - self.last_speed > Player.SPEED_COOLDOWN:
+            self.isBoost = True
+            self.last_speed = time.time()
         
 # murder bot 5000
-class AIPlayer(Player):
+class AIPlayerAttack(Player):
     def __init__(self, x, y, game, opponent_team_i):
         super().__init__(x, y)
         self.game = game
@@ -97,6 +110,32 @@ class AIPlayer(Player):
             if self.y > e1.y:
                 angle += math.pi
         self.shoot(angle, 250)
+        
+        if self.angle < angle:
+            self.rotate(2 * timediff)
+        else:
+            self.rotate(-2 * timediff)
+        
+        self.moveForwards(150 * timediff)
+
+class AIPlayerHold(Player):
+    def __init__(self, x, y, game, opponent_team_i):
+        super().__init__(x, y)
+        self.game = game
+        self.opponent_team_i = opponent_team_i
+        
+    def update(self, timediff):
+        r1 = self.game.score_regions[0]
+        for r in self.game.score_regions:
+            if (r.x - self.x)**2 + (r.y - self.y)**2 < (r1.x - self.x)**2 + (r1.y - self.y)**2:
+                r1 = r
+        if self.y - r1.y == 0:
+            angle = 0
+        else:
+            grad = (self.x - r1.x) / (self.y - r1.y)
+            angle = math.atan(grad)
+            if self.y > r1.y:
+                angle += math.pi
         
         if self.angle < angle:
             self.rotate(2 * timediff)
