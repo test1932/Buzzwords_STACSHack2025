@@ -56,12 +56,17 @@ class Game:
             Wall(700, 25, 900, 50), # top
             Wall(700, 775, 900, 50), # bottom
             
-            Wall(400, 200, 300, 50),
-            Wall(800, 500, 20, 400),
-            Wall(600, 400, 300, 50)
-            # Wall(400, 200, 300, 50),
-            # Wall(400, 200, 300, 50),
-            # Wall(400, 200, 300, 50),
+            Wall(450, 250, 25, 150),
+            Wall(450, 550, 25, 250),
+            
+            Wall(950, 550, 25, 150),
+            Wall(950, 250, 25, 250),
+            
+            Wall(700, 250, 250, 25),
+            Wall(700, 550, 250, 25),
+            
+            Wall(700, 150, 25, 200),
+            Wall(700, 650, 25, 200)
         ]
         
         self.score_regions = [
@@ -118,6 +123,7 @@ class Game:
 
         self.handleLetterGain(timediff)
         self.handleWallCollision()
+        self.handlePlayerCollision()
     
     def handleTypingMode(self, player, team_i):
         for key in player.held_keys:
@@ -169,6 +175,18 @@ class Game:
             for player in team:
                 for wall in self.walls:
                     self.handleCollision(player, wall)
+                    
+    def handlePlayerCollision(self):
+        for team in self.teams:
+            for player1 in team:
+                for otherTeam in self.teams:
+                    for player2 in otherTeam:
+                        if player1 == player2:
+                            continue
+                        self.handlePCollision(player1, player2)
+    
+    def handlePCollision(self, p1, p2):
+        Wall.handleCollision(p1, p2)
                     
     def handleCollision(self, player, wall):
         wall.handleCollision(player)

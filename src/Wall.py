@@ -14,7 +14,6 @@ class Wall:
         ))
         
     def handleCollision(self, player):
-        # TODO fix
         p_width = player.image.get_rect().width
         p_height = player.image.get_rect().height
         

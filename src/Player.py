@@ -76,7 +76,29 @@ class Player:
         self.isTyping = data["typing"]
         self.typedWord = data["word"]
         return self
-            
+        
+# murder bot 5000
+class AIPlayer(Player):
+    def __init__(self, x, y, game, opponent_team_i):
+        super().__init__(x, y)
+        self.game = game
+        self.opponent_team_i = opponent_team_i
+        
+    def run(self):
+        while True:
+            e1 = self.game.teams[self.opponent_team_i][0]
+            for e in self.game.teams[self.opponent_team_i]:
+                if (e.x - self.x)**2 + (e.y - self.y)**2 > (e1.x - self.x)**2 + (e1.y - self.y)**2:
+                    e1 = e
+            if self.y - e1.mouseY == 0:
+                angle = 0
+            else:
+                grad = (self.x - e1.x) / (self.y - e1.y)
+                angle = math.atan(grad)
+                if self.y > e1.y:
+                    angle += math.pi
+            self.shoot(angle, 250)
+    
 class NetPlayer(Player):
     def __init__(self, x, y, conn):
         super().__init__(x, y)
