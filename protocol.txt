@@ -1,0 +1,15 @@
+{
+    type: "keyup" | "keydown"
+}
+
+{
+    type: "keyup",
+    key: "",
+    mouse: [x, y]
+}
+
+{
+    type: "keydown",
+    key: "",
+    mouse: [x, y]
+}
