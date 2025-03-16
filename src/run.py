@@ -44,7 +44,13 @@ else:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
     conn = sock
-    MCAST_INFO = json.loads(sock.recv(1024).decode("utf-8"))
+    time.sleep(0.5)
+    data = sock.recv(1024).decode("utf-8")
+    
+    i = data.find("}") + 1
+    pos = json.loads(data[i:])
+
+    MCAST_INFO = json.loads(data[:i])
     msock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     try:
         msock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -58,7 +64,6 @@ else:
                     socket.inet_aton(MCAST_INFO["ip"]) + socket.inet_aton(host))
     msock.bind((MCAST_INFO["ip"],MCAST_INFO["port"]))
     
-    pos = json.loads(sock.recv(1024).decode("utf-8"))
     game = Game(pos)
     
     multicastThread = threading.Thread(target = game.multicastListener, args=[msock])
