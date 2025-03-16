@@ -10,6 +10,7 @@ import socket
 
 pygame.font.init()
 font = pygame.font.SysFont('Comic Sans MS', 30)
+fontLobby = pygame.font.SysFont('Comic Sans MS', 150)
 
 def collides(first, other):
     intersects_x = abs(other.x - first.x) - (first.width / 2 + other.width / 2)
@@ -304,11 +305,11 @@ class Game:
         self.displayTypedWord(screen)
         
     def displayWin(self, screen):
-        screen.blit(font.render(f"Winner: {self.winner}", False, (0,0,0)), (200, 200))
+        screen.blit(fontLobby.render(f"Winner: {self.winner}", False, (0,0,0)), (200, 200))
         
     def displayLobby(self, screen):
-        screen.blit(font.render("Lobby", False, (0,0,0)), (200, 200))
-        screen.blit(font.render(str(len(self.teams[0])) + " vs " + str(len(self.teams[1])), False, (0,0,0)), (200, 250))
+        screen.blit(fontLobby.render("Lobby", False, (0,0,0)), (200, 200))
+        screen.blit(fontLobby.render(str(len(self.teams[0])) + " vs " + str(len(self.teams[1])), False, (0,0,0)), (200, 400))
     
     def displayTypedWord(self, screen):
         pygame.draw.rect(screen, (200, 150, 150), pygame.Rect(200, 800, 1000, 100))
@@ -325,9 +326,17 @@ class Game:
             region.display(screen)
         
     def displayPlayers(self, screen):
-        for team in self.teams:
-            for player in team:
+        for (i, team) in enumerate(self.teams):
+            for (j, player) in enumerate(team):
                 player.display(screen)
+                if self.playerPos == [i, j]:
+                    pygame.draw.circle(screen, (255,0,0), (player.x, player.y), 10, 5)
+                elif i == 0:
+                    pygame.draw.circle(screen, (255,255,255), (player.x, player.y), 20, 5)
+                    pygame.draw.circle(screen, (0,255,0), (player.x, player.y), 15, 5)
+                elif i == 1:
+                    pygame.draw.circle(screen, (255,255,255), (player.x, player.y), 25, 5)
+                    pygame.draw.circle(screen, (0,0,255), (player.x, player.y), 20, 5)
                 
     def displayWalls(self, screen):
         for wall in self.walls:

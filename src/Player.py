@@ -99,9 +99,11 @@ class AIPlayerAttack(Player):
         
     def update(self, timediff):
         e1 = self.game.teams[self.opponent_team_i][0]
+        x = 1000
         for e in self.game.teams[self.opponent_team_i]:
             if (e.x - self.x)**2 + (e.y - self.y)**2 < (e1.x - self.x)**2 + (e1.y - self.y)**2:
                 e1 = e
+                x = (e.x - self.x)**2 + (e.y - self.y)**2 < (e1.x - self.x)**2 + (e1.y - self.y)**2
         if self.y - e1.y == 0:
             angle = 0
         else:
@@ -109,7 +111,8 @@ class AIPlayerAttack(Player):
             angle = math.atan(grad)
             if self.y > e1.y:
                 angle += math.pi
-        self.shoot(angle, 250)
+        if (x ** 0.5) < 5:
+            self.shoot(angle, 250)
         
         if self.angle < angle:
             self.rotate(2 * timediff)
