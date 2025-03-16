@@ -1,4 +1,4 @@
-from Player import Player, NetPlayer
+from Player import Player, NetPlayer, AIPlayer
 from Wall import Wall
 from Region import Region
 import pygame
@@ -109,6 +109,12 @@ class Game:
                 if key == "return":
                     self.init()
                     self.phase = "game"
+                elif key == "space":
+                    if len(self.teams[0]) > len(self.teams[1]):
+                        self.teams[1].append(AIPlayer(1,1,self, 0))
+                    else:
+                        self.teams[0].append(AIPlayer(1,1,self, 1))
+            self.teams[0][0].held_keys = []
         
         for (i,team) in enumerate(self.teams):
             for player in team:
@@ -119,11 +125,36 @@ class Game:
                 
         for team in self.teams:
             for player in team:
+                if type(player) == AIPlayer:
+                    player.update(timediff)
                 player.updateProjectiles(timediff)
 
         self.handleLetterGain(timediff)
         self.handleWallCollision()
         self.handlePlayerCollision()
+        self.handleProjectileCollisions()
+        
+    def handleProjectileCollisions(self):
+        for team in self.teams:
+            for otherteam in self.teams:
+                for player in team:
+                    for otherplayer in otherteam:
+                        self.handleProjectileCollisionsBetweenPlayers(player, otherplayer)
+    
+    def handleProjectileCollisionsBetweenPlayers(self, p1, p2):
+        if p1 == p2:
+            return
+        to_remove_p1 = []
+        to_remove_p2 = []
+        for pr1 in p1.projectiles:
+            for pr2 in p2.projectiles:
+                if collides(pr1, pr2)[0]:
+                    to_remove_p1.append(pr1)
+                    to_remove_p2.append(pr2)
+        for i in to_remove_p1:
+            p1.projectiles.remove(i)
+        for i in to_remove_p2:
+            p2.projectiles.remove(i)
     
     def handleTypingMode(self, player, team_i):
         for key in player.held_keys:
@@ -212,7 +243,8 @@ class Game:
                             other_player.y = self.spawns[i].y
             
         for ob in to_remove:
-            player.projectiles.remove(ob)
+            if ob in player.projectiles:
+                player.projectiles.remove(ob)
     
     def handleLetterGain(self, timediff):
         for region in self.score_regions:
