@@ -70,7 +70,9 @@ class Game:
         ]
         
         self.score_regions = [
-            Region(700, 400, 100, (0,0,255))
+            Region(700, 400, 100, (0,0,255)),
+            Region(900, 600, 100, (0,0,255)),
+            Region(500, 200, 100, (0,0,255))
         ]
         
         self.spawns = [
@@ -324,14 +326,13 @@ class Game:
             
     def displayWords(self, screen):
         for (i, team) in enumerate(self.teams):
-            x = 20 if i == 1 else 1020
-            x2 = 20 if i == 1 else 1220
+            x = 20 if i == 1 else 1220
             for (j, word) in enumerate(self.shownWords[i]):
                 sur = font.render(word, False, (0,0,0))
                 screen.blit(sur, (x, j * 50 + 50))
                 
             prog = font.render(str(round(self.teamProgress[i] * 100, 2)) + "%", False, (0,0,0))
-            screen.blit(prog, (x2, 750))
+            screen.blit(prog, (x, 750))
             
     def serialize(self):
         return {
